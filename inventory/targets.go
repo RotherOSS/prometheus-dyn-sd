@@ -25,8 +25,8 @@ func GetTarget(hostname string) (config.Host, error) {
 		log.Println("Failed to fetch target because config " + config.Filepath + " could not be parsed. Skip getting and returning targets.")
 		return config.Host{}, err
 	}
-	for _, host := range hosts.Hosts {
-		if host.Hostname == hostname {
+	for _, host := range hosts {
+		if host.Hostname[0] == hostname {
 			return host, err
 		}
 	}
@@ -36,10 +36,10 @@ func GetTarget(hostname string) (config.Host, error) {
 func AddTarget(host config.Host) error {
 	hosts, err := getTargets()
 	if err != nil {
-		log.Println("Failed to add target " + host.Hostname + " because config " + config.Filepath + " could not be parsed. Skip adding target.")
+		log.Println("Failed to add target " + host.Hostname[0] + " because config " + config.Filepath + " could not be parsed. Skip adding target.")
 		return err
 	}
-	hosts.Hosts = append(hosts.Hosts, host)
+	hosts = append(hosts, host)
 	data, err := json.MarshalIndent(hosts, "", "\t")
 	if err != nil {
 		log.Println("Failed to marshal host struct to byteCode. Error: \n " + err.Error())
@@ -59,9 +59,9 @@ func RemoveTarget(hostname string) (error, bool) {
 		log.Println("Failed to remove target " + hostname + " because config " + config.Filepath + " could not be parsed. Skip removing target.")
 		return err, found
 	}
-	for i, host := range hosts.Hosts {
-		if host.Hostname == hostname {
-			hosts.Hosts = append(hosts.Hosts[:i], hosts.Hosts[i+1:]...)
+	for i, host := range hosts {
+		if host.Hostname[0] == hostname {
+			hosts = append(hosts[:i], hosts[i+1:]...)
 			found = true
 			break
 		}
@@ -81,12 +81,12 @@ func RemoveTarget(hostname string) (error, bool) {
 func UpdateTarget(target config.Host) error {
 	hosts, err := getTargets()
 	if err != nil {
-		log.Println("Failed to update target " + target.Hostname + " because config " + config.Filepath + " could not be parsed. Skip updating target.")
+		log.Println("Failed to update target " + target.Hostname[0] + " because config " + config.Filepath + " could not be parsed. Skip updating target.")
 		return err
 	}
-	for i, host := range hosts.Hosts {
-		if host.Hostname == target.Hostname {
-			hosts.Hosts[i] = target
+	for i, host := range hosts {
+		if host.Hostname[0] == target.Hostname[0] {
+			hosts[i] = target
 		}
 	}
 	data, err := json.MarshalIndent(hosts, "", "\t")

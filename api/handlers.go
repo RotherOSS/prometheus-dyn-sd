@@ -24,7 +24,7 @@ func getHost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while retrieving target Host: \n"+err.Error())
 		return
 	}
-	if host.Hostname == "" {
+	if host.Hostname[0] == "" {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while retrieving target Host: No such Host.")
 		return
 	}
@@ -38,8 +38,8 @@ func createHost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while parsing JSON Body: \n"+err.Error())
 		return
 	}
-	name, error := inventory.GetTarget(host.Hostname)
-	if error == nil && name.Hostname != "" {
+	name, error := inventory.GetTarget(host.Hostname[0])
+	if error == nil && len(name.Hostname) > 0 {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while adding Host: Host already exists")
 		return
 	}
