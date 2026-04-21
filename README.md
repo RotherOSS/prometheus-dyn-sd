@@ -39,7 +39,7 @@ services:
 | `/hosts/{id}` | GET | Returns the body from the selected host | `No` |
 | `/hosts/{id}` | PUT | Creates a new host | `Yes` |
 | `/hosts/{id}` | PUT | Update an existing host | `Yes` |
-| `/hosts/{id}` | DELETE | Delete an existing host | `Yes` |
+| `/hosts/{id}` | DELETE | Delete an existing host | `No` |
 
 The body for each required endpoint should have the following format.
 ```json
