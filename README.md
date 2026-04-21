@@ -48,10 +48,9 @@ The body for each required endpoint should have the following format.
     "host.local.yourdomain.de"
   ],
   "labels": {
-    "url": "https://www.yourdomain.de"
+    "webpage": "https://www.yourdomain.de",
+    "mylabel": "custom"
   }
 }
 ```
-`hostname` represents the hostname which is used to ping the host. It can also be replaced with an IP address. Futhermore `url` allows to add a webserver address which can also be monitored in relationship to it's host. It is only possible to add one web address for every entry due the `scrape_config` limitations from prometheus. If you want to add multiple websites to monitor you should consider createing multiple json entries for a single host. 
-
-It is also possible to add custom labels to the host using the labels mapping.
+`hostname` represents the hostname which is used to ping the host. It can also be replaced with an IP address. Futhermore `labels` allows to add custom labels to the host for instance to monitor Web endpoints associated with the host.
