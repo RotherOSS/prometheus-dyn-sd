@@ -1,0 +1,16 @@
+{
+	"hosts": [
+		{
+			"hostname": "test.host.de",
+			"url": "https://test.de"
+		},
+		{
+			"hostname": "test.host.de",
+			"url": "https://test.de"
+		},
+		{
+			"hostname": "test.host.de",
+			"url": "https://test.de"
+		}
+	]
+}
