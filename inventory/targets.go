@@ -15,7 +15,10 @@ func getTargets() (config.Hosts, error) {
 		return config.Hosts{}, err
 	}
 	var hosts config.Hosts
-	json.Unmarshal(byteValue, &hosts)
+	err = json.Unmarshal(byteValue, &hosts)
+	if err != nil {
+		log.Println("Error parsing JSON in " + config.Filepath + ". Error: \n" + err.Error())
+	}
 	return hosts, err
 }
 
@@ -26,7 +29,7 @@ func GetTarget(hostname string) (config.Host, error) {
 		return config.Host{}, err
 	}
 	for _, host := range hosts {
-		if host.Hostname[0] == hostname {
+		if len(host.Hostname) > 0 && host.Hostname[0] == hostname {
 			return host, err
 		}
 	}
@@ -60,7 +63,7 @@ func RemoveTarget(hostname string) (error, bool) {
 		return err, found
 	}
 	for i, host := range hosts {
-		if host.Hostname[0] == hostname {
+		if len(host.Hostname) > 0 && host.Hostname[0] == hostname {
 			hosts = append(hosts[:i], hosts[i+1:]...)
 			found = true
 			break
@@ -84,8 +87,11 @@ func UpdateTarget(target config.Host) error {
 		log.Println("Failed to update target " + target.Hostname[0] + " because config " + config.Filepath + " could not be parsed. Skip updating target.")
 		return err
 	}
+	if len(target.Hostname) == 0 {
+		return nil
+	}
 	for i, host := range hosts {
-		if host.Hostname[0] == target.Hostname[0] {
+		if len(host.Hostname) > 0 && host.Hostname[0] == target.Hostname[0] {
 			hosts[i] = target
 		}
 	}
