@@ -13,11 +13,9 @@ import (
 func Initialize() {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
-		// Erlaubt alle Ursprünge (für die Entwicklung am einfachsten)
-		// Später kannst du hier auch nur ["http://grafana.otobo.org"] eintragen
 		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Accept"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
