@@ -23,7 +23,7 @@ services:
 ```
 
 > [!WARNING]  
-> It's recommended to run the container on the same host as the backend target and therefore bind the exposed port to 127.0.0.1 (localhost) since it doesn't support auth security natively. If not it's highly recommendet to secure the API endpoints with some kind of authentication using a Reverse Proxy.
+> If you're opened port is exposed to the public it's recommended to secure your endpoints with some kind of authentication by using an external reverse proxy.
 
 ## Environment Variables
 

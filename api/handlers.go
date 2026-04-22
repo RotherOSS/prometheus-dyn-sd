@@ -36,7 +36,7 @@ func getHost(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while retrieving target Host: \n"+err.Error())
 		return
 	}
-	if host.Hostname[0] == "" {
+	if len(host.Hostname) == 0 {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while retrieving target Host: No such Host.")
 		return
 	}
@@ -68,10 +68,12 @@ func updateHost(c *gin.Context) {
 	err := c.ShouldBindBodyWithJSON(&host)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while parsing JSON Body: \n"+err.Error())
+		return
 	}
 	err = inventory.UpdateTarget(host)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while updating Host: \n"+err.Error())
+		return
 	}
 	c.JSON(http.StatusAccepted, "OK")
 }
@@ -81,9 +83,11 @@ func deleteHost(c *gin.Context) {
 	err, found := inventory.RemoveTarget(target)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while updating Host: \n"+err.Error())
+		return
 	}
 	if found == false {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while updating Host: No such Host.")
+		return
 	}
 	c.JSON(http.StatusAccepted, "OK")
 }
