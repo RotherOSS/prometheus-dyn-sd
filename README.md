@@ -12,7 +12,7 @@ The example config below shows a simple configuration that exposes the api servi
 ```yaml
 services:
     prometheus-dyn-sd:
-        image: ghcr.io/splayfunityde/roonie:latest
+        image: ghcr.io/rotheross/prometheus-dyn-sd:main
         container_name: prometheus-dyn-sd
         restart: unless-stopped
         ports: 8010:8010
