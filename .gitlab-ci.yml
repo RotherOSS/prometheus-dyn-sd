@@ -1,45 +1,26 @@
-name: Build and Deploy on GHCR
+variables:
+  # Path and name to the image
+  IMAGE_NAME: ${CI_REGISTRY_IMAGE}:${CI_COMMIT_REF_NAME}
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_BUILDKIT: 1
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+# Job to build & publish main image
+toolbox_build:
+  image: docker:24-dind
+  tags:
+    - docker
 
-env:
-  REGISTRY: ghcr.io
+  services:
+    - name: docker:24-dind
+      alias: docker
+      command: ["--tls=false"]
 
-jobs:
-  toolbox_build:
-    runs-on: ubuntu-latest
-    
-    permissions:
-      contents: read
-      packages: write
+  before_script:
+    - docker login -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD} ${CI_REGISTRY}
+  script:
+    - docker build -t ${IMAGE_NAME} --file Dockerfile .
+    - docker push ${IMAGE_NAME}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Prepare Image Name
-        run: |
-          TAG_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF_NAME}}
-          IMAGE_ID=$(echo "${{ env.REGISTRY }}/${{ github.repository }}:${TAG_NAME}" | tr '[:upper:]' '[:lower:]')
-          echo "IMAGE_NAME=$IMAGE_ID" >> $GITHUB_ENV
-
-      - name: Log in to the Container registry
-        uses: docker/login-action@v3
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ env.IMAGE_NAME }}
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
