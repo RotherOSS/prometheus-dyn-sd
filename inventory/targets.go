@@ -4,11 +4,18 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"sync"
 
 	"git.otobo.org/rotheross/intern/prometheus-dyn-sd/config"
 )
 
-func getTargets() (config.Hosts, error) {
+type Config struct {
+	Filepath string
+	mux      sync.Mutex
+}
+
+// This function is called without mux.Lock() because it is only called inside other functions that already implement mutex
+func (conf *Config) getTargets() (config.Hosts, error) {
 	byteValue, err := os.ReadFile(config.Filepath)
 	if err != nil {
 		log.Println("Error while reading " + config.Filepath + ". Skipping this entry. Error: \n" + err.Error())
@@ -22,8 +29,10 @@ func getTargets() (config.Hosts, error) {
 	return hosts, err
 }
 
-func GetTarget(hostname string) (config.Host, error) {
-	var hosts, err = getTargets()
+func (conf *Config) GetTarget(hostname string) (config.Host, error) {
+	conf.mux.Lock()
+	defer conf.mux.Unlock()
+	var hosts, err = conf.getTargets()
 	if err != nil {
 		log.Println("Failed to fetch target because config " + config.Filepath + " could not be parsed. Skip getting and returning targets.")
 		return config.Host{}, err
@@ -36,8 +45,10 @@ func GetTarget(hostname string) (config.Host, error) {
 	return config.Host{}, err
 }
 
-func AddTarget(host config.Host) error {
-	hosts, err := getTargets()
+func (conf *Config) AddTarget(host config.Host) error {
+	conf.mux.Lock()
+	defer conf.mux.Unlock()
+	hosts, err := conf.getTargets()
 	if err != nil {
 		log.Println("Failed to add target " + host.Hostname[0] + " because config " + config.Filepath + " could not be parsed. Skip adding target.")
 		return err
@@ -55,8 +66,10 @@ func AddTarget(host config.Host) error {
 	return err
 }
 
-func RemoveTarget(hostname string) (error, bool) {
-	hosts, err := getTargets()
+func (conf *Config) RemoveTarget(hostname string) (error, bool) {
+	conf.mux.Lock()
+	defer conf.mux.Unlock()
+	hosts, err := conf.getTargets()
 	var found bool = false
 	if err != nil {
 		log.Println("Failed to remove target " + hostname + " because config " + config.Filepath + " could not be parsed. Skip removing target.")
@@ -81,8 +94,10 @@ func RemoveTarget(hostname string) (error, bool) {
 	return err, found
 }
 
-func UpdateTarget(target config.Host) error {
-	hosts, err := getTargets()
+func (conf *Config) UpdateTarget(target config.Host) error {
+	conf.mux.Lock()
+	defer conf.mux.Unlock()
+	hosts, err := conf.getTargets()
 	if err != nil {
 		log.Println("Failed to update target " + target.Hostname[0] + " because config " + config.Filepath + " could not be parsed. Skip updating target.")
 		return err

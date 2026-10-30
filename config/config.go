@@ -1,6 +1,8 @@
 package config
 
-import "os"
+import (
+	"os"
+)
 
 var Filepath string = os.Getenv("PROMETHEUS_DYN_SD_FILEPATH")
 

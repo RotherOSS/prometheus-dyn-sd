@@ -12,6 +12,7 @@ import (
 func checkConfigFile() {
 	var path = config.Filepath
 	_, err := os.Stat(path)
+
 	if err == nil {
 		log.Println("Config file " + path + " exists. Skipping file creation.")
 	} else if errors.Is(err, os.ErrNotExist) {

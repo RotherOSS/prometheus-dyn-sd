@@ -10,6 +10,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Server struct {
+	Conf *inventory.Config
+}
+
 func Initialize() {
 	r := gin.Default()
 	r.Use(cors.New(cors.Config{
@@ -22,16 +26,19 @@ func Initialize() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
-	r.GET("/hosts/:id", getHost)       // Get a host
-	r.POST("/hosts", createHost)       // Create a host
-	r.PUT("/hosts/:id", updateHost)    // Update a host
-	r.DELETE("/hosts/:id", deleteHost) // Delete a host
+
+	server := &Server{Conf: &inventory.Config{Filepath: config.Filepath}}
+
+	r.GET("/hosts/:id", server.getHost)       // Get a host
+	r.POST("/hosts", server.createHost)       // Create a host
+	r.PUT("/hosts/:id", server.updateHost)    // Update a host
+	r.DELETE("/hosts/:id", server.deleteHost) // Delete a host
 	r.Run(":8010")
 }
 
-func getHost(c *gin.Context) {
+func (server *Server) getHost(c *gin.Context) {
 	target := c.Param("id")
-	host, err := inventory.GetTarget(target)
+	host, err := server.Conf.GetTarget(target)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while retrieving target Host: \n"+err.Error())
 		return
@@ -43,19 +50,19 @@ func getHost(c *gin.Context) {
 	c.JSON(http.StatusOK, host)
 }
 
-func createHost(c *gin.Context) {
+func (server *Server) createHost(c *gin.Context) {
 	var host config.Host
 	err := c.ShouldBindBodyWithJSON(&host)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while parsing JSON Body: \n"+err.Error())
 		return
 	}
-	name, error := inventory.GetTarget(host.Hostname[0])
+	name, error := server.Conf.GetTarget(host.Hostname[0])
 	if error == nil && len(name.Hostname) > 0 {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while adding Host: Host already exists")
 		return
 	}
-	err = inventory.AddTarget(host)
+	err = server.Conf.AddTarget(host)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while adding Host: \n"+err.Error())
 		return
@@ -63,14 +70,14 @@ func createHost(c *gin.Context) {
 	c.JSON(http.StatusAccepted, "OK")
 }
 
-func updateHost(c *gin.Context) {
+func (server *Server) updateHost(c *gin.Context) {
 	var host config.Host
 	err := c.ShouldBindBodyWithJSON(&host)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while parsing JSON Body: \n"+err.Error())
 		return
 	}
-	err = inventory.UpdateTarget(host)
+	err = server.Conf.UpdateTarget(host)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while updating Host: \n"+err.Error())
 		return
@@ -78,9 +85,9 @@ func updateHost(c *gin.Context) {
 	c.JSON(http.StatusAccepted, "OK")
 }
 
-func deleteHost(c *gin.Context) {
+func (server *Server) deleteHost(c *gin.Context) {
 	target := c.Param("id")
-	err, found := inventory.RemoveTarget(target)
+	err, found := server.Conf.RemoveTarget(target)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, c.Request.Method+" Request failed while updating Host: \n"+err.Error())
 		return
