@@ -2,7 +2,7 @@
 
 A REST application written in Go that provides dynamic File-Based Service Discovery (File SD). It allows you to manage scrape targets on the fly using simple REST API endpoints.
 
-Compatible with most telemetry backends that support that support Prometheus `file_sd_configs` protocol such as [Prometheus](https://prometheus.io/docs/guides/file-sd/), [Mimir](https://grafana.com/docs/mimir/latest/configure/about-configurations/), [Loki](https://grafana.com/docs/loki/latest/configure/) and [Grafana Alloy](https://grafana.com/docs/alloy/latest/).
+Compatible with most telemetry backends that support Prometheus `file_sd_configs` protocol such as [Prometheus](https://prometheus.io/docs/guides/file-sd/), [Mimir](https://grafana.com/docs/mimir/latest/configure/about-configurations/), [Loki](https://grafana.com/docs/loki/latest/configure/) and [Grafana Alloy](https://grafana.com/docs/alloy/latest/).
 
 ## Getting started
 
